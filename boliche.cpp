@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <cstdlib> //necessario para pausar a execucao e continuar ao apertar qualquer botao
 #include <time.h> //necessario para gerar numeros realmente aleatorios
+#include <conio.h>
 
 //declaracao do elemento das listas
 typedef struct sPontuacao{
@@ -35,8 +36,7 @@ void calculaPontuacaoFinal(Jogador *jogador, int qtd);
 int qtdJogadores();
 void iniciarJogo(Jogador *jogador, int qtd);
 void freeMemory(Jogador *jogador, int qtd);
-void ordenaJogadores(Jogador *jogador, int qtd);
-void imprimeJogadores(Jogador *jogador, int qtd);
+void imprimeJogadoresOrdenados(Jogador *jogador, int qtd);
 void ajuda();
 
 main(){
@@ -58,8 +58,7 @@ main(){
 					iniciarJogo(jogador, qtd);
 					imprimePlacar(jogador, qtd);
 					calculaPontuacaoFinal(jogador, qtd);
-					ordenaJogadores(jogador, qtd);
-					imprimeJogadores(jogador, qtd);
+					imprimeJogadoresOrdenados(jogador, qtd);
 					freeMemory(jogador, qtd);
 					printf("\n\n\n");
 					system("pause");
@@ -88,7 +87,7 @@ Jogador* criaJogador(int qtd){
     	jogador[i].tail=NULL;
 		jogador[i].size=0;
 		jogador[i].totalPontos=0;
-		jogador[i].id=0;
+		jogador[i].id=i;
 	}
 	return jogador;
 }
@@ -133,6 +132,7 @@ void imprimePlacar(Jogador *jogador, int qtd){
 	}	
 }
 
+//soma todos os pontos dos jogadores
 void calculaPontuacaoFinal(Jogador *jogador, int qtd){
 	int soma=0;
 	Pontuacao *aux;
@@ -242,43 +242,40 @@ void freeMemory(Jogador *jogador, int qtd){
     free(jogador);
 }
 
-//ordena os jogadores conforme a sua pontuacao final
-//metodo de ordenacao: Bubble Sort
-//retidado de "https://terminaldeinformacao.com/2013/05/10/ordenando-vetores-usando-linguagem-c/"
-void ordenaJogadores(Jogador *jogador, int qtd){
-	Jogador *aux=(Jogador*)malloc(sizeof(Jogador));
-	int i, j; 
- 
-  	for(j=qtd-1; j<=1; j--){ 
-    	for(i=0; i>j; i++){ 
-      		if(jogador[i].totalPontos > jogador[i+1].totalPontos){ 
-		        aux->head=jogador[i].head;
-		        aux->tail=jogador[i].tail;
-		        aux->size=jogador[i].size;
-		        aux->totalPontos=jogador[i].totalPontos;
-		        aux->id=jogador[i].id;
-				 
-		        jogador[i].head=jogador[i+1].head;
-		        jogador[i].tail=jogador[i+1].tail;
-		        jogador[i].size=jogador[i+1].size;
-		        jogador[i].totalPontos=jogador[i+1].totalPontos;
-		        jogador[i].id=jogador[i+1].id;
+//imprime os jogadores ordenados com base na sua pontuacao
+void imprimeJogadoresOrdenados(Jogador *jogador, int qtd){
+	int i, j, aux, vet[qtd];
+	
+	//salva todas as pontuacoes em um vetor.
+	for(i=0; i<qtd; i++){
+		vet[i]=jogador[i].totalPontos;
+	}
+ 	
+ 	//InsertionSort, ordena o vetor
+ 	//retirado de "https://www.youtube.com/watch?v=79buQYoWszA"
+ 	for(i=0; i<qtd; i++){
+ 		aux= vet[i];
+ 		for(j=i; (j>0) && (aux < vet[j-1]); j--)
+ 			vet[j]= vet[j-1];
+ 		vet[j]= aux;
+	}
+	
+	//percorro o vetor ordenado e os jogadores, caso algum jogador
+	//tenha a mesma pontuacao daquela posicao do vetor, ele sera impresso.
+	for(i=qtd-1; i>=0; i--){
+		for(j=0; j<qtd; j++){
+			if(vet[i]==jogador[j].totalPontos){
 				
-				jogador[i+1].head= aux->head;
-				jogador[i+1].tail= aux->tail;
-				jogador[i+1].size= aux->size;
-				jogador[i+1].totalPontos= aux->totalPontos;
-				jogador[i+1].id= aux->id;
-      		} 
-    	} 
-  	}
-}
-
-//imprime os jogadores com suas pontuacoes
-void imprimeJogadores(Jogador *jogador, int qtd){
-	printf("Jogador %d: %d pontos, VENCEDOR!!", jogador[0].id, jogador[0].totalPontos);
-	for(int i=1; i<qtd; i++){
-		printf("Jogador %d: %d pontos", jogador[i].id, jogador[i].totalPontos);
+				//o primeiro jogador, ou seja, aquele que tem mais pontos, eh o vencedor
+				if(jogador[j].totalPontos==vet[qtd-1]){
+					printf("\n\nJogador %d: %d pontos, VENCEDOR!!\n", j+1, vet[i]);
+				}else{
+					printf("Jogador %d: %d pontos\n", j+1, vet[i]);
+				}
+				jogador[j].totalPontos=-1;
+				break;
+			}
+		}
 	}
 }
 
