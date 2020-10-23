@@ -25,7 +25,6 @@ typedef struct sJogador{
 	struct sPontuacao *tail;
 	int size;
 	int totalPontos;
-	int id;
 }Jogador;
 
 //prototipacao das funcoes
@@ -87,7 +86,6 @@ Jogador* criaJogador(int qtd){
     	jogador[i].tail=NULL;
 		jogador[i].size=0;
 		jogador[i].totalPontos=0;
-		jogador[i].id=i;
 	}
 	return jogador;
 }
@@ -175,7 +173,7 @@ void iniciarJogo(Jogador *jogador, int qtd){
 			if(i<9){
 				printf("\nJogador %d\n", x+1);
 				for(int y=0; y<2; y++){
-					pinos=rand() % totalPinos+1;
+					pinos=rand() % (totalPinos+1);
 					printf("tentativa %d, %d pinos derrubados.\n",y+1,pinos);
 					totalPinos-=pinos;
 					soma+=pinos;
@@ -199,7 +197,7 @@ void iniciarJogo(Jogador *jogador, int qtd){
 			}else{
 				printf("\nJogador %d\n", x+1);
 				for(int y=0; y<3; y++){
-					pinos=rand() % totalPinos+1;
+					pinos=rand() % (totalPinos+1);
 					printf("tentativa %d, %d pinos derrubados.\n",y+1,pinos);
 					totalPinos-=pinos;
 					if(totalPinos==0){
